@@ -1,0 +1,41 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL") // Dibutuhkan Supabase untuk migrations
+}
+
+// ─── Model Sensor Kolam Lele ──────────────────────────────────
+// Menyimpan 1 baris per pembacaan (semua sensor dalam 1 row)
+// untuk efisiensi storage
+model SensorKolam {
+  id               Int      @id @default(autoincrement())
+  deviceId         String   @map("device_id")
+  timestamp        DateTime @default(now())
+  suhuAir          Float?   @map("suhu_air")          // °C
+  ph               Float?                              // 0-14
+  dissolvedOxygen  Float?   @map("dissolved_oxygen")  // mg/L
+  tds              Float?                              // ppm (Total Dissolved Solids)
+
+  @@index([deviceId, timestamp])
+  @@map("sensor_kolam")
+}
+
+// ─── Model Sensor Tanah ───────────────────────────────────────
+model SensorTanah {
+  id               Int      @id @default(autoincrement())
+  deviceId         String   @map("device_id")
+  timestamp        DateTime @default(now())
+  kelembabanTanah  Float?   @map("kelembaban_tanah")  // %
+  suhuTanah        Float?   @map("suhu_tanah")        // °C
+  phTanah          Float?   @map("ph_tanah")          // 0-14
+
+  @@index([deviceId, timestamp])
+  @@map("sensor_tanah")
+}
